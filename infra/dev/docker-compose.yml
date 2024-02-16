@@ -1,0 +1,89 @@
+version: "3"
+services:
+  database:
+    container_name: "${INFRA}-database"
+    image: postgres:16.2
+    env_file:
+      - .env
+    volumes:
+      - ./persistent/database:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    container_name: "${INFRA}-app"
+    build:
+      context: ./
+      dockerfile: ./app/Dockerfile
+      args:
+        - HOST_GID=${HOST_GID}
+        - HOST_UID=${HOST_UID}
+        - CONTAINER_USER=${CONTAINER_USER}
+        - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+        - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+        - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+        - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+        - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+        - DJANGO_DEBUG=${DJANGO_DEBUG}
+        - DJANGO_MEDIA_DIR=${DJANGO_MEDIA_DIR}
+    working_dir: /app/project
+    volumes:
+      - ../../src:/app
+      - ./persistent/media:/media
+      - ./persistent/logs:/logs
+    depends_on:
+      - database
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  nginx:
+    container_name: "${INFRA}-nginx"
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+      args:
+        - HOST_GID=${HOST_GID}
+        - HOST_UID=${HOST_UID}
+        - CONTAINER_USER=${CONTAINER_USER}
+    depends_on:
+      - app
+    volumes:
+      - ../../src/project/staticfiles:/static
+    restart: unless-stopped
+    ports:
+      - 8181:80
+    env_file:
+      - .env
+
+  memcached:
+    container_name: "${INFRA}-memcached"
+    image: memcached:latest
+    restart: unless-stopped
+
+  rabbitmq:
+    container_name: "${INFRA}-rabbitmq"
+    image: rabbitmq:3.12.12
+    volumes:
+      - ./persistent/rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  celeryworker:
+    container_name: "${INFRA}-celeryworker"
+    build:
+      context: ./
+      dockerfile: ./celeryWorker/Dockerfile
+      args:
+        - HOST_GID=${HOST_GID}
+        - HOST_UID=${HOST_UID}
+        - CONTAINER_USER=${CONTAINER_USER}
+        - DJANGO_MEDIA_DIR=${DJANGO_MEDIA_DIR}
+    working_dir: /app/project
+    volumes:
+      - ../../src:/app
+      - ./persistent/media:/media
+      - ./persistent/logs:/logs
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+    env_file:
+      - .env
