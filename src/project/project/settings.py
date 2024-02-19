@@ -36,6 +36,10 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(
     " "
 )
 
+CORS_ALLOWED_ORIGINS = os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "").split(
+    " "
+)
+
 SECURE_PROXY_SSL_HEADER = None
 
 if os.getenv("DJANGO_USE_SSL", "False").lower() in ("true", "1", "t"):
@@ -112,6 +116,7 @@ if ADMIN_LOG_FILE:
         open(ADMIN_LOG_FILE, "w").close()
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

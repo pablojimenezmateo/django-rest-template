@@ -1,7 +1,7 @@
-from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework import permissions
 from api.serializers import AuthTokenSerializer
+from api.models import ExpiringToken
 from rest_framework.response import Response
 
 
@@ -19,12 +19,13 @@ class GetToken(ObtainAuthToken):
         )
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        token, _ = Token.objects.get_or_create(user=user)
+        token, _ = ExpiringToken.objects.get_or_create(user=user)
         return Response(
             {
                 "id": user.pk,
                 "username": user.username,
                 "email": user.email,
                 "token": token.key,
+                "expiry_date": token.expiry_date,
             }
         )
