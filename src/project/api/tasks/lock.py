@@ -3,6 +3,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from contextlib import contextmanager
 from django.core.cache import cache
+from typing import Generator
 
 logger = get_task_logger(__name__)
 
@@ -10,7 +11,7 @@ LOCK_EXPIRE = 60 * 20  # Lock expires in 20 minutes
 
 
 @contextmanager
-def memcache_lock(lock_id):
+def memcache_lock(lock_id: str) -> Generator[bool, None, None]:
     timeout_at = time.monotonic() + LOCK_EXPIRE - 3
     # cache.add fails if the key already exists
     acquired = cache.add(lock_id, "locked", LOCK_EXPIRE)
@@ -28,12 +29,12 @@ def memcache_lock(lock_id):
 
 
 @shared_task
-def create_lock(lock_id):
+def create_lock(lock_id: str) -> bool:
     return cache.add(lock_id, "locked", LOCK_EXPIRE)
 
 
 @shared_task
-def remove_lock(lock_id):
+def remove_lock(lock_id: str) -> None:
     logger.info("Removing lock")
     cache.delete(lock_id)
     logger.info("Lock removed")

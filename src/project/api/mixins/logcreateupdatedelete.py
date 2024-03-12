@@ -48,7 +48,7 @@ class LogCreateUpdateDeleteMixin(models.Model):
         super().delete(*args, **kwargs)
 
 
-def get_model_fields(object):
+def get_model_fields(object: models.Model) -> dict:
     fields = {}
     for field in object._meta.fields:
         if field.name == "password":

@@ -3,6 +3,8 @@ import logging
 from api.models import ExpiringToken
 import json
 from django.http import QueryDict
+from typing import Callable, Any, Optional
+from django.http import HttpRequest, HttpResponse
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -16,10 +18,12 @@ logger.addHandler(handler)
 
 
 class LoggerMiddleware:
-    def __init__(self, get_response):
+    def __init__(
+        self, get_response: Callable[[HttpRequest], HttpResponse]
+    ) -> None:
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponse:
         # Code to be executed for each request before
         # the view (and later middleware) are called.
 
@@ -50,7 +54,9 @@ class LoggerMiddleware:
 
         return response
 
-    def process_exception(self, request, exception):
+    def process_exception(
+        self, request: HttpRequest, exception: Exception
+    ) -> Optional[Any]:
         # Code to be executed for each request after
         # an exception is raised.
         logger.info(
@@ -64,7 +70,13 @@ class LoggerMiddleware:
 
         return None
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(
+        self,
+        request: HttpRequest,
+        view_func: Callable,
+        view_args: tuple,
+        view_kwargs: dict,
+    ) -> Optional[Any]:
         # This method is optional for additional logging
         # before the view is called.
         # Example: logging the view name
@@ -80,7 +92,7 @@ class LoggerMiddleware:
 
         return None
 
-    def get_user(self, request):
+    def get_user(self, request: HttpRequest) -> str:
         user = None
         auth_header = request.headers.get("Authorization")
 
@@ -97,7 +109,7 @@ class LoggerMiddleware:
         else:
             return f"{user.id} ({user.email})"
 
-    def get_request_params(self, request):
+    def get_request_params(self, request: HttpRequest) -> dict:
         if request.method in ["GET", "DELETE"]:
             # Parameters are in the URL for GET and DELETE
             return request.GET.dict()
