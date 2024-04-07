@@ -10,4 +10,5 @@ urlpatterns = [
     path("demo/", views.DemoView.as_view()),
 ]
 
-urlpatterns += router.urls
+# It is safe to ignore the type error here
+urlpatterns += router.urls  # type: ignore

@@ -5,11 +5,12 @@ from django.http import HttpRequest
 from django.conf import settings
 
 import logging
+from logging.handlers import TimedRotatingFileHandler
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 # Use TimedRotatingFileHandler for daily log file rotation
-handler = logging.handlers.TimedRotatingFileHandler(
+handler = TimedRotatingFileHandler(
     settings.ADMIN_LOG_FILE, when="midnight", interval=1, backupCount=0
 )
 formatter = logging.Formatter("%(asctime)s - %(message)s")

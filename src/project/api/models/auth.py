@@ -72,4 +72,4 @@ class ExpiringToken(LogCreateUpdateDeleteMixin, Token):
     expiry_date = models.DateTimeField(default=default_expiry)
     is_used = models.BooleanField(default=False)
     permanent = models.BooleanField(default=False)
-    objects = ExpiringTokenManager()
+    objects = ExpiringTokenManager()  # type: ignore

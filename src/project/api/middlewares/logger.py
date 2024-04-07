@@ -1,5 +1,6 @@
 from django.conf import settings
 import logging
+from logging.handlers import TimedRotatingFileHandler
 from api.models import ExpiringToken
 import json
 from django.http import QueryDict
@@ -9,7 +10,7 @@ from django.http import HttpRequest, HttpResponse
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 # Use TimedRotatingFileHandler for daily log file rotation
-handler = logging.handlers.TimedRotatingFileHandler(
+handler = TimedRotatingFileHandler(
     settings.API_LOG_FILE, when="midnight", interval=1, backupCount=0
 )
 formatter = logging.Formatter("%(asctime)s - %(message)s")
@@ -25,7 +26,7 @@ class LoggerMiddleware:
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
         # Code to be executed for each request before
-        # the view (and later middleware) are called.
+        # the view (and later middleware) are called
 
         # Log the request details
         user = self.get_user(request)
@@ -58,7 +59,7 @@ class LoggerMiddleware:
         self, request: HttpRequest, exception: Exception
     ) -> Optional[Any]:
         # Code to be executed for each request after
-        # an exception is raised.
+        # an exception is raised
         logger.info(
             (
                 f"[E] User: {self.get_user(request)} "

@@ -1,0 +1,12 @@
+{
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length", "79"],
+  "python.linting.enabled": true,
+  "python.linting.mypyEnabled": true,
+  "mypy.runUsingActiveInterpreter": true,
+  "mypy.configFile": "./mypy.ini",
+  "mypy.targets": ["."]
+}

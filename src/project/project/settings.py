@@ -85,9 +85,9 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "amqp://rabbitmq:5672//")
 CELERY_IMPORTS = ["api.tasks"]
 
 # Log files
-API_LOG_FILE = os.getenv("API_LOG_FILE", "")
-MODELS_LOG_FILE = os.getenv("MODELS_LOG_FILE", "")
-ADMIN_LOG_FILE = os.getenv("ADMIN_LOG_FILE", "")
+API_LOG_FILE = os.getenv("API_LOG_FILE", "/tmp/django.log")
+MODELS_LOG_FILE = os.getenv("MODELS_LOG_FILE", "/tmp/models.log")
+ADMIN_LOG_FILE = os.getenv("ADMIN_LOG_FILE", "/tmp/admin.log")
 
 # Create the directory for the log file if it doesn't exist
 if API_LOG_FILE:
